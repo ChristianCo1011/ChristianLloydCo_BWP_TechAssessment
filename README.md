@@ -5,6 +5,13 @@
 - **Time spent:** ~4 hours (Parts A–D)
 - **Environment:** Windows, PHP 8.5.3, Composer, Laravel 13 (Part A), MySQL 8.x, MySQL Workbench (Part C)
 
+## Clone this repository
+
+```bash
+git clone https://github.com/ChristianCo1011/ChristianLloydCo_BWP_TechAssessment.git
+cd ChristianLloydCo_BWP_TechAssessment
+```
+
 **Part A** is a runnable Laravel JSON API; **Parts B–D** are the legacy review write-up, MySQL workbook, and a static HTML/CSS/JS page, as required by the brief.
 
 > **For reviewers:** **Part A** → [`laravel/`](laravel/) (migrations, Eloquent, JSON routes, Form Requests, reference seeder; commands in [`laravel/README.md`](laravel/README.md)). **Part B** → [`part_b/legacy_review.md`](part_b/legacy_review.md). **Part C** → [`part_c/`](part_c/) ([`queries.sql`](part_c/queries.sql), [`q03_indexes.md`](part_c/q03_indexes.md), [`screenshots/`](part_c/screenshots/)). **Part D** → [`part_d/`](part_d/) (open `index.html` via a local server—see below). The directory tree matches the repo on disk.
