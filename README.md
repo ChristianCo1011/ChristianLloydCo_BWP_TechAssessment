@@ -53,6 +53,10 @@ Reviewers should **`cd laravel`** before `composer install`, migrations, seed, a
 
 - **Reference seed:** [`laravel/database/seeders/BwpAssessmentReferenceSeeder.php`](laravel/database/seeders/BwpAssessmentReferenceSeeder.php) — two projects (`SUNSET`, `RIDGE`) and five properties aligned with Part D’s [`part_d/BWP_Software_Engineer_Technical_Assessment_properties.json`](part_d/BWP_Software_Engineer_Technical_Assessment_properties.json).
 
+### Part A — improvements
+
+Remove unneeded Composer/npm packages in [`laravel/composer.json`](laravel/composer.json) and [`laravel/package.json`](laravel/package.json), then `composer install` and the checks in [`laravel/README.md`](laravel/README.md).
+
 ## Part B — Legacy PHP review
 
 Open [`part_b/legacy_review.md`](part_b/legacy_review.md). It contains:
