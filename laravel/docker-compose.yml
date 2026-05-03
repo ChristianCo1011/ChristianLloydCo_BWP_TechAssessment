@@ -1,0 +1,26 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: bwp_laravel_mysql
+    restart: unless-stopped
+    ports:
+      # Host 3307 → container 3306 (avoids conflicts with local MySQL / Docker Desktop on 3306)
+      - "${MYSQL_PUBLISH_PORT:-3307}:3306"
+    environment:
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-bwp_laravel}"
+      # Official image does not allow MYSQL_USER=root; use MYSQL_ROOT_PASSWORD for root.
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-1011}"
+      # Allow root from host/WSL via published port (client appears as e.g. 172.x.x.x, not localhost).
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - bwp_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      # First-time init can take well over 20s (data dir + InnoDB); avoid "healthy" too early.
+      start_period: 90s
+
+volumes:
+  bwp_mysql_data:

@@ -1,0 +1,7 @@
+[
+  {"id":1,"label":"Apt 101","status":"available","price":450000,"project_code":"SUNSET"},
+  {"id":2,"label":"Apt 102","status":"reserved","price":460000,"project_code":"SUNSET"},
+  {"id":3,"label":"Lot 7","status":"sold","price":890000,"project_code":"RIDGE"},
+  {"id":4,"label":"Apt 205","status":"available","price":520000,"project_code":"RIDGE"},
+  {"id":5,"label":"Penthouse A","status":"available","price":1200000,"project_code":"SUNSET"}
+]

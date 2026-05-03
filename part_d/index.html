@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BWP &mdash; Properties (Part D)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Properties</h1>
+      <p>Part D &mdash; client-side filtered table loaded via AJAX from <code>BWP_Software_Engineer_Technical_Assessment_properties.json</code>.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="filtersHeading">
+      <h2 id="filtersHeading" class="hidden">Filters and results</h2>
+
+      <div class="controls">
+        <label for="textFilter">
+          Search (label or project code)
+          <input
+            id="textFilter"
+            type="search"
+            placeholder="e.g. Apt or SUNSET"
+            autocomplete="off"
+          />
+        </label>
+
+        <label for="statusFilter">
+          Status
+          <select id="statusFilter">
+            <option value="all">All</option>
+            <option value="available">Available</option>
+            <option value="reserved">Reserved</option>
+            <option value="sold">Sold</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="errorBanner" class="error hidden" role="alert"></div>
+
+      <div class="meta">
+        <span id="resultCount" aria-live="polite">Loading&hellip;</span>
+      </div>
+
+      <table id="propertiesTable" aria-describedby="resultCount">
+        <thead>
+          <tr>
+            <th scope="col">Label</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="price">Price</th>
+            <th scope="col">Project</th>
+          </tr>
+        </thead>
+        <tbody id="propertiesBody"></tbody>
+      </table>
+
+      <div id="emptyState" class="empty hidden">No properties match the current filters.</div>
+
+      <footer>Tip: serve this folder over HTTP (e.g. <code>php -S localhost:8000</code>) so the browser allows <code>fetch()</code>.</footer>
+    </section>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
