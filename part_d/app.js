@@ -1,4 +1,4 @@
-(function () {
+(function ($) {
   'use strict';
 
   /** @type {string} Static JSON file next to this page (served over HTTP). */
@@ -11,24 +11,15 @@
   var loadedProperties = [];
 
   /**
-   * Cached references to DOM nodes used by the table and filters.
-   * @type {{
-   *   textFilterInput: HTMLInputElement,
-   *   statusFilterSelect: HTMLSelectElement,
-   *   tableBody: HTMLTableSectionElement,
-   *   resultSummary: HTMLElement,
-   *   emptyState: HTMLElement,
-   *   errorBanner: HTMLElement
-   * }}
+   * Cached jQuery wrappers for DOM nodes used by the table and filters.
+   * @type {jQuery}
    */
-  var dom = {
-    textFilterInput: document.getElementById('textFilter'),
-    statusFilterSelect: document.getElementById('statusFilter'),
-    tableBody: document.getElementById('propertiesBody'),
-    resultSummary: document.getElementById('resultCount'),
-    emptyState: document.getElementById('emptyState'),
-    errorBanner: document.getElementById('errorBanner')
-  };
+  var $textFilter;
+  var $statusFilter;
+  var $tableBody;
+  var $resultSummary;
+  var $emptyState;
+  var $errorBanner;
 
   /** @type {Intl.NumberFormat} Formats numeric `price` for table cells. */
   var priceDisplayFormatter = new Intl.NumberFormat('en-US', {
@@ -43,9 +34,8 @@
    * @returns {void}
    */
   function showLoadOrRuntimeError(userVisibleMessage) {
-    dom.errorBanner.textContent = userVisibleMessage;
-    dom.errorBanner.classList.remove('hidden');
-    dom.resultSummary.textContent = '';
+    $errorBanner.text(userVisibleMessage).removeClass('hidden');
+    $resultSummary.text('');
   }
 
   /**
@@ -53,8 +43,7 @@
    * @returns {void}
    */
   function hideErrorBanner() {
-    dom.errorBanner.textContent = '';
-    dom.errorBanner.classList.add('hidden');
+    $errorBanner.text('').addClass('hidden');
   }
 
   /**
@@ -77,8 +66,8 @@
    * @returns {Array<Object>} Subset of {@link loadedProperties}.
    */
   function getFilteredProperties() {
-    var searchTextLower = (dom.textFilterInput.value || '').trim().toLowerCase();
-    var selectedStatusValue = dom.statusFilterSelect.value;
+    var searchTextLower = ($textFilter.val() || '').trim().toLowerCase();
+    var selectedStatusValue = $statusFilter.val();
 
     return loadedProperties.filter(function (propertyRow) {
       if (selectedStatusValue !== 'all' && propertyRow.status !== selectedStatusValue) {
@@ -106,10 +95,10 @@
     var totalLoadedCount = loadedProperties.length;
 
     if (filteredProperties.length === 0) {
-      dom.tableBody.innerHTML = '';
-      dom.emptyState.classList.remove('hidden');
+      $tableBody.empty();
+      $emptyState.removeClass('hidden');
     } else {
-      dom.emptyState.classList.add('hidden');
+      $emptyState.addClass('hidden');
       var tableRowsHtml = filteredProperties
         .map(function (propertyRow) {
           var priceCellHtml;
@@ -137,15 +126,16 @@
           );
         })
         .join('');
-      dom.tableBody.innerHTML = tableRowsHtml;
+      $tableBody.html(tableRowsHtml);
     }
 
-    dom.resultSummary.textContent =
+    $resultSummary.text(
       'Showing ' +
       filteredProperties.length +
       ' of ' +
       totalLoadedCount +
-      ' properties.';
+      ' properties.'
+    );
   }
 
   /**
@@ -153,44 +143,63 @@
    * @returns {void}
    */
   function attachFilterEventListeners() {
-    dom.textFilterInput.addEventListener('input', renderPropertyTable);
-    dom.statusFilterSelect.addEventListener('change', renderPropertyTable);
+    $textFilter.on('input', renderPropertyTable);
+    $statusFilter.on('change', renderPropertyTable);
   }
 
   /**
-   * Fetches {@link PROPERTIES_JSON_URL}, validates JSON shape, stores rows in
-   * {@link loadedProperties}, then renders. On failure, shows {@link showLoadOrRuntimeError}.
-   * @returns {Promise<void>}
+   * Loads {@link PROPERTIES_JSON_URL} via jQuery.ajax (no browser cache),
+   * validates JSON shape, stores rows in {@link loadedProperties}, then renders.
+   * On failure, shows {@link showLoadOrRuntimeError}.
+   * @returns {JQuery.jqXHR|JQuery.Promise}
    */
   function loadPropertiesFromJson() {
-    return fetch(PROPERTIES_JSON_URL, { cache: 'no-store' })
-      .then(function (httpResponse) {
-        if (!httpResponse.ok) {
-          throw new Error('HTTP ' + httpResponse.status + ' ' + httpResponse.statusText);
-        }
-        return httpResponse.json();
-      })
-      .then(function (parsedJsonBody) {
+    return $.ajax({
+      url: PROPERTIES_JSON_URL,
+      dataType: 'json',
+      cache: false
+    })
+      .done(function (parsedJsonBody) {
         if (!Array.isArray(parsedJsonBody)) {
-          throw new Error('Expected a JSON array of properties.');
+          showLoadOrRuntimeError(
+            'Could not load properties. Expected a JSON array of properties. If you opened this file directly (file://), serve the folder over HTTP, e.g. "php -S localhost:8000".'
+          );
+          $tableBody.empty();
+          $emptyState.addClass('hidden');
+          return;
         }
         loadedProperties = parsedJsonBody;
         hideErrorBanner();
         renderPropertyTable();
       })
-      .catch(function (fetchOrParseError) {
+      .fail(function (xhr, textStatus, errorThrown) {
+        var detail;
+        if (textStatus === 'parsererror') {
+          detail = 'Invalid JSON response.';
+        } else if (xhr && xhr.status) {
+          detail = 'HTTP ' + xhr.status + ' ' + (xhr.statusText || '');
+        } else {
+          detail = String(errorThrown || textStatus || 'Request failed');
+        }
         showLoadOrRuntimeError(
           'Could not load properties. ' +
-            fetchOrParseError.message +
+            detail +
             ' If you opened this file directly (file://), serve the folder over HTTP, e.g. "php -S localhost:8000".'
         );
-        dom.tableBody.innerHTML = '';
-        dom.emptyState.classList.add('hidden');
+        $tableBody.empty();
+        $emptyState.addClass('hidden');
       });
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  $(function () {
+    $textFilter = $('#textFilter');
+    $statusFilter = $('#statusFilter');
+    $tableBody = $('#propertiesBody');
+    $resultSummary = $('#resultCount');
+    $emptyState = $('#emptyState');
+    $errorBanner = $('#errorBanner');
+
     attachFilterEventListeners();
     loadPropertiesFromJson();
   });
-})();
+})(jQuery);

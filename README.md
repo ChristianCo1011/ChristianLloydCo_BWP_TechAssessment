@@ -43,7 +43,7 @@ ChristianLloydCo_BWP_TechAssessment/
 └── part_d/
     ├── index.html                                            ← Part D markup
     ├── styles.css                                            ← Part D styles
-    ├── app.js                                                ← fetch, filters, table
+    ├── app.js                                                ← jQuery, filters, table
     └── BWP_Software_Engineer_Technical_Assessment_properties.json  ← Part D data (HR filename)
 ```
 
@@ -84,7 +84,7 @@ This repo snapshot does **not** ship `part_c/schema.sql`, the HR reference seed 
 
 ## Part D — JavaScript filter table
 
-**Vanilla JavaScript** (no jQuery or build step): [`part_d/index.html`](part_d/index.html), [`part_d/styles.css`](part_d/styles.css), and [`part_d/app.js`](part_d/app.js). `app.js` loads [`part_d/BWP_Software_Engineer_Technical_Assessment_properties.json`](part_d/BWP_Software_Engineer_Technical_Assessment_properties.json) via `fetch`, renders a table, and provides:
+**jQuery** (3.7.1 from the official CDN in [`part_d/index.html`](part_d/index.html); no build step): [`part_d/styles.css`](part_d/styles.css) and [`part_d/app.js`](part_d/app.js). `app.js` loads [`part_d/BWP_Software_Engineer_Technical_Assessment_properties.json`](part_d/BWP_Software_Engineer_Technical_Assessment_properties.json) with `$.ajax` (`cache: false`), renders a table, and provides:
 
 - Case-insensitive text filter against `label` or `project_code`
 - Status dropdown (All / available / reserved / sold)
@@ -92,7 +92,7 @@ This repo snapshot does **not** ship `part_c/schema.sql`, the HR reference seed 
 
 ### How to run
 
-`fetch()` from `file://` is blocked by modern browsers, so serve `part_d/` over HTTP. From a PowerShell terminal at the repo root:
+Loading the JSON over `file://` is unreliable in modern browsers, so serve `part_d/` over HTTP. From a PowerShell terminal at the repo root:
 
 ```powershell
 cd part_d
@@ -111,4 +111,4 @@ Then open <http://localhost:8000/> in your browser.
 - Part C Q5 includes projects with zero active EOIs and shows `0` for the count via a `LEFT JOIN` plus `COUNT(DISTINCT)`.
 - Part C Q7 uses a CTE so the window function's partition includes EOIs of all statuses; the active filter is applied in the outer query.
 - Part C Q8 uses `JOIN ... DISTINCT` to handle the multiple-pending-EOIs-per-apartment case safely; apartments already in `'sold'` are explicitly skipped.
-- Part D price is rendered with `Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })`; change locale/currency in the `priceFormatter` literal if a different display is preferred.
+- Part D price is rendered with `Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })` in `part_d/app.js` (`priceDisplayFormatter`); change locale/currency there if a different display is preferred.
